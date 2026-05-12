@@ -57,7 +57,7 @@
             const [messages, setMessages] = useState([
                 { 
                     role: 'assistant', 
-                    content: 'مرحباً بكِ في المساعد الذكي لجامعة الأميرة نورة بنت عبد الرحمن. أنا هنا للإجابة على استفساراتكِ حصرياً بناءً على "اللائحة المنظمة للدراسات العليا وقواعدها التنفيذية بجامعة الأميرة نورة". كيف يمكنني خدمتكِ اليوم؟' 
+                    content: 'مرحباً بكِ في المساعد الذكي لجامعة الأميرة نورة بنت عبد الرحمن. أنا مبرمج للبحث الحصري داخل لائحة الدراسات العليا الرسمية للجامعة. كيف يمكنني مساعدتكِ اليوم؟' 
                 }
             ]);
             const [input, setInput] = useState('');
@@ -65,8 +65,9 @@
             const [isDarkMode, setIsDarkMode] = useState(false);
             const messagesEndRef = useRef(null);
 
-            const apiKey = ""; // يتم توفيره في البيئة
-            const pnuLogo = "https://drive.google.com/uc?export=view&id=1xyWQeaftK_5nkxrn7BaWYOIxc9iCsUfI";
+            const apiKey = ""; // سيتم توفيره تلقائياً
+            const pnuLogo = "https://pnu.edu.sa/Style%20Library/NewStyle/UI5/images/pnu-logo-ar.svg";
+            const pdfUrl = "https://pnu.edu.sa/ar/Deanship/postgraduate/Lists/Guidelines/Attachments/4/%D8%A7%D9%84%D9%84%D8%A7%D9%8A%D9%94%D8%AD%D8%A9%20%D8%A7%D9%84%D9%85%D9%86%D8%B8%D9%85%D8%A9%20%D9%84%D9%84%D8%AF%D8%B1%D8%A7%D8%B3%D8%A7%D8%AA%20%D8%A7%D9%84%D8%B9%D9%84%D9%8A%D8%A7%20%D1%81%D9%8A%20%D8%A7%D9%84%D8%AC%D8%A7%D9%85%D8%B9%D8%A7%D8%AA.pdf";
 
             const scrollToBottom = () => {
                 messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -77,10 +78,10 @@
             }, [messages]);
 
             const quickCommands = [
-                { id: 'pnu_admission', label: 'شروط القبول', icon: <Icons.User />, prompt: 'ما هي شروط القبول العامة والخاصة في الدراسات العليا بجامعة الأميرة نورة بناءً على اللائحة المرفقة؟' },
-                { id: 'pnu_duration', label: 'مدة الدراسة النظامية', icon: <Icons.Clock />, prompt: 'ما هي مدة الدراسة النظامية للماجستير والدكتوراه حسب القواعد التنفيذية لجامعة الأميرة نورة؟' },
-                { id: 'pnu_thesis', label: 'تسجيل الرسالة', icon: <Icons.File />, prompt: 'اشرحي لي إجراءات تسجيل الرسالة العلمية حسب القواعد المذكورة في ملف جامعة الأميرة نورة.' },
-                { id: 'pnu_defer', label: 'التأجيل والاعتذار', icon: <Icons.Alert />, prompt: 'ما هي ضوابط تأجيل الدراسة أو الاعتذار عنها في جامعة الأميرة نورة كما ورد في اللائحة؟' },
+                { id: 'pnu_admission', label: 'شروط القبول', icon: <Icons.User />, prompt: `استناداً إلى اللائحة الرسمية في الرابط (${pdfUrl})، ما هي شروط القبول المحددة لجامعة الأميرة نورة؟` },
+                { id: 'pnu_duration', label: 'مدة الدراسة النظامية', icon: <Icons.Clock />, prompt: `ما هي مدة الدراسة النظامية للبرامج المختلفة حسب ما ورد في اللائحة الرسمية (${pdfUrl})؟` },
+                { id: 'pnu_thesis', label: 'تسجيل الرسالة', icon: <Icons.File />, prompt: `اشرحي لي خطوات تسجيل الرسالة العلمية كما نصت عليها اللائحة في الرابط (${pdfUrl}).` },
+                { id: 'pnu_defer', label: 'التأجيل والاعتذار', icon: <Icons.Alert />, prompt: `ما هي ضوابط التأجيل والاعتذار المذكورة في اللائحة المعتمدة (${pdfUrl})؟` },
             ];
 
             const handleSend = async (text = input) => {
@@ -96,16 +97,27 @@
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            contents: [{ parts: [{ text: `السؤال: ${text}. تعليمات: استخدمي حصرياً ملف اللائحة التنفيذية لجامعة الأميرة نورة. إذا لم تجدي الإجابة قولي أنها غير متوفرة. خاطبي المستخدمة بصيغة المؤنث.` }] }],
-                            systemInstruction: { parts: [{ text: "أنتِ المساعدة الذكية لجامعة الأميرة نورة (PNU). إجاباتكِ دقيقة ومستمدة من اللائحة فقط." }] }
+                            contents: [{ 
+                                parts: [{ 
+                                    text: `السؤال: ${text}. 
+                                    ملاحظة صارمة: يجب أن تقتصر الإجابة حصراً على المعلومات الموجودة في "اللائحة المنظمة للدراسات العليا" المتوفرة في هذا الرابط: ${pdfUrl}. 
+                                    لا تستخدمي أي معلومات عامة أو سابقة. إذا لم تتوفر المعلومة في الرابط، اطلبي من المستخدمة مراجعة العمادة مباشرة. 
+                                    خاطبي المستخدمة بصيغة المؤنث.` 
+                                }] 
+                            }],
+                            systemInstruction: { 
+                                parts: [{ 
+                                    text: `أنتِ المساعدة الذكية الرسمية لجامعة الأميرة نورة (PNU). مهمتكِ الوحيدة هي البحث في ملف اللائحة التنفيذية المتوفر عبر الرابط الحكومي الرسمي المرفق. كوني دقيقة جداً وموثقة في إجاباتكِ.` 
+                                }] 
+                            }
                         })
                     });
 
                     const result = await response.json();
-                    const aiResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || "نعتذر، لم نتمكن من الوصول للمعلومة المطلوبة حالياً.";
+                    const aiResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || "نعتذر، لم نتمكن من العثور على إجابة دقيقة داخل اللائحة الرسمية حالياً.";
                     setMessages(prev => [...prev, { role: 'assistant', content: aiResponse }]);
                 } catch (error) {
-                    setMessages(prev => [...prev, { role: 'assistant', content: "عذراً، حدث خطأ في الاتصال. يرجى المحاولة لاحقاً." }]);
+                    setMessages(prev => [...prev, { role: 'assistant', content: "عذراً، حدث خطأ في الاتصال بالملف الرسمي. يرجى المحاولة لاحقاً." }]);
                 } finally {
                     setLoading(false);
                 }
@@ -128,14 +140,14 @@
                         <nav className="flex-1 space-y-3 overflow-y-auto no-scrollbar">
                             <div className="flex items-center gap-2 mb-4 px-2 opacity-50">
                                 <Icons.Shield />
-                                <p className="text-[11px] font-black tracking-widest">محرك بحث اللائحة</p>
+                                <p className="text-[11px] font-black tracking-widest">مصدر البيانات: الرابط الرسمي</p>
                             </div>
                             {quickCommands.map((cmd) => (
                                 <button
                                     key={cmd.id}
                                     onClick={() => handleSend(cmd.prompt)}
                                     className={`w-full flex items-center gap-3 px-4 py-4 rounded-2xl transition-all text-right border
-                                        ${isDarkMode ? 'hover:bg-slate-700 border-slate-700 bg-slate-800/50' : 'hover:bg-emerald-50 border-[#daeada] bg-white'}`}
+                                        ${isDarkMode ? 'hover:bg-slate-700 border-slate-700 bg-slate-800/50' : 'hover:bg-emerald-50 border-[#daeada] bg-white shadow-sm shadow-emerald-900/5'}`}
                                 >
                                     <div className="p-2 rounded-lg bg-emerald-50 text-[#006747]">
                                         {cmd.icon}
@@ -146,6 +158,13 @@
                         </nav>
 
                         <div className="mt-auto pt-4 space-y-3 text-center">
+                            <a 
+                                href={pdfUrl} 
+                                target="_blank" 
+                                className="block w-full py-3 rounded-xl bg-[#006747] text-white text-[11px] font-bold hover:bg-[#004d35] transition-colors"
+                            >
+                                فتح اللائحة الرسمية (PDF)
+                            </a>
                             <button 
                                 onClick={() => setIsDarkMode(!isDarkMode)}
                                 className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-[#daeada] bg-white text-sm font-semibold"
@@ -156,6 +175,7 @@
                                 </div>
                             </button>
                             <div className="p-4 bg-emerald-900 rounded-2xl text-[10px] text-emerald-100 opacity-80">
+                                بحث ذكي مقيد بلائحة الجامعة الموثقة © 2024
                             </div>
                         </div>
                     </aside>
@@ -168,15 +188,15 @@
                                     <img src={pnuLogo} alt="Logo" className="w-full h-full object-contain" />
                                 </div>
                                 <div>
-                                    <h2 className="font-black text-[#006747] dark:text-emerald-400">مساعد اللائحة الذكي</h2>
-                                    <p className="text-[10px] text-emerald-600/50 font-bold italic">البحث في ملف اللائحة فقط</p>
+                                    <h2 className="font-black text-[#006747] dark:text-emerald-400">مساعد اللائحة الرسمي</h2>
+                                    <p className="text-[10px] text-emerald-600/50 font-bold italic tracking-tighter">يتم البحث في رابط جامعة نورة المعتمد</p>
                                 </div>
                             </div>
                         </header>
 
                         <div className={`flex-1 overflow-y-auto p-4 md:p-10 space-y-8 ${isDarkMode ? 'bg-slate-900' : 'bg-[#f4f9f4]'} no-scrollbar`}>
                             {messages.map((msg, index) => (
-                                <div key={index} className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-end'}`}>
+                                <div key={index} className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-end animate-in fade-in slide-in-from-bottom-2'}`}>
                                     <div className={`max-w-[85%] md:max-w-[75%] rounded-3xl p-5 shadow-sm relative
                                         ${msg.role === 'user' 
                                             ? (isDarkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-[#daeada]') 
@@ -194,14 +214,14 @@
                                 </div>
                             ))}
                             {loading && (
-                                <div className="flex justify-end">
-                                    <div className="bg-[#006747] text-white rounded-3xl p-5 flex items-center gap-3">
+                                <div className="flex justify-end animate-pulse">
+                                    <div className="bg-[#006747] text-white rounded-3xl p-5 flex items-center gap-3 shadow-lg shadow-[#006747]/20">
                                         <div className="flex gap-1">
                                             <span className="w-2 h-2 bg-white rounded-full animate-bounce"></span>
                                             <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:0.2s]"></span>
                                             <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:0.4s]"></span>
                                         </div>
-                                        <span className="text-xs font-bold">جاري البحث...</span>
+                                        <span className="text-xs font-bold">جاري البحث في الرابط الرسمي...</span>
                                     </div>
                                 </div>
                             )}
@@ -215,15 +235,15 @@
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                                    placeholder="اسألي عن شروط القبول، المواد، أو الأنظمة..."
+                                    placeholder="اسألي عن بنود اللائحة المعتمدة..."
                                     className={`w-full py-5 pr-5 pl-14 rounded-[2rem] border-2 transition-all outline-none font-bold
-                                        ${isDarkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-[#fcfdfc] border-[#daeada] shadow-inner focus:border-[#006747]'}`}
+                                        ${isDarkMode ? 'bg-slate-900 border-slate-700 text-white focus:border-emerald-500' : 'bg-[#fcfdfc] border-[#daeada] shadow-inner focus:border-[#006747]'}`}
                                 />
                                 <button 
                                     onClick={() => handleSend()}
                                     disabled={loading || !input.trim()}
                                     className={`absolute left-3 p-3 rounded-full transition-all shadow-lg text-white
-                                        ${loading || !input.trim() ? 'bg-gray-300' : 'bg-[#006747] hover:scale-105 active:scale-95'}`}
+                                        ${loading || !input.trim() ? 'bg-gray-300' : 'bg-[#006747] hover:bg-[#004d35] hover:scale-105 active:scale-95'}`}
                                 >
                                     <Icons.Send />
                                 </button>
