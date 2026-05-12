@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مساعد الدراسات العليا - جامعة الأميرة نورة</title>
+    <title>دليل الدراسات العليا - جامعة الأميرة نورة</title>
     <!-- مكتبات التشغيل -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -32,19 +32,22 @@
             box-shadow: 0 10px 15px -3px rgba(0, 103, 71, 0.05);
         }
 
-        .highlight {
-            background-color: #d1fae5;
-            color: #065f46;
-            font-weight: bold;
-            padding: 0 2px;
-            border-radius: 2px;
-        }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-msg { animation: fadeIn 0.3s ease-out forwards; }
+
+        .category-header {
+            background: linear-gradient(to left, #006747, #004d35);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            margin-top: 16px;
+        }
     </style>
 </head>
 <body class="bg-[#f4f9f4]">
@@ -53,36 +56,55 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // داتا اللائحة المدمجة (مستخرجة من الملف المرفق)
-        const PNU_REGULATIONS = [
-            { id: 1, title: "المادة الأولى: التعريفات", content: "الدراسات العليا هي مرحلة دراسية أعلى من مرحلة البكالوريوس كالدبلوم العالي، أو الماجستير، أو الدكتوراه. التصنيف هو التصنيف السعودي الموحد للمستويات والتخصصات التعليمية." },
-            { id: 2, title: "المادة الثالثة: شروط القبول", content: "يشترط للقبول في الدراسات العليا: 1. أن يكون المتقدم حاصلاً على الشهادة الجامعية من جامعة سعودية أو جامعة معترف بها. 2. أن يكون حسن السيرة والسلوك ولائقاً طبياً. 3. تقديم تزكيتين علميتين. 4. موافقة مرجعه على الدراسة إذا كان موظفاً." },
-            { id: 3, title: "القاعدة التنفيذية للمادة الثالثة (جامعة نورة)", content: "يجوز للقسم المختص اشتراط اجتياز عدد من المقررات التكميلية. كما يشترط الحصول على درجة محددة في اختبارات القدرات العامة للجامعيين أو ما يعادلها." },
-            { id: 4, title: "المادة الثامنة عشر: مدة الدراسة", content: "المدة النظامية للحصول على الدبلوم العالي لا تقل عن فصلين دراسيين ولا تزيد عن أربعة فصول." },
-            { id: 5, title: "المادة التاسعة عشر: مدة الماجستير", content: "المدة النظامية للحصول على درجة الماجستير لا تقل عن أربعة فصول دراسية ولا تزيد عن ستة فصول دراسية." },
-            { id: 6, title: "المادة العشرون: مدة الدكتوراه", content: "المدة النظامية للحصول على درجة الدكتوراه لا تقل عن ستة فصول دراسية ولا تزيد عن عشرة فصول دراسية." },
-            { id: 7, title: "المادة الرابعة والعشرون: التأجيل والاعتذار", content: "يجوز للطالب تأجيل دراسته قبل بدء الفصل الدراسي بما لا يتجاوز فصلين دراسيين متتاليين أو ثلاثة فصول غير متتالية." },
-            { id: 8, title: "المادة الخامسة والثلاثون: الرسالة العلمية", content: "يتم اختيار موضوع الرسالة من قبل الطالب ويقره مجلس القسم ومجلس الكلية. يجب أن يتسم الموضوع بالأصالة والإضافة العلمية." },
-            { id: 9, title: "القواعد العامة", content: "تطبق هذه اللائحة على جميع طالبات الدراسات العليا بجامعة الأميرة نورة بنت عبد الرحمن. مجلس الجامعة هو المرجع لتفسير هذه القواعد." }
+        // قاعدة البيانات النصية المستخرجة من اللائحة والقواعد التنفيذية
+        const PNU_DATA = [
+            { 
+                category: "القبول والتسجيل",
+                items: [
+                    { id: 1, title: "شروط القبول العامة", content: "يشترط للقبول في الدراسات العليا: \n1. أن يكون المتقدم حاصلاً على الشهادة الجامعية من جامعة سعودية أو معترف بها.\n2. حسن السيرة والسلوك والياقة الطبية.\n3. تقديم تزكيتين علميتين من أساتذة سبق لهم تدريسه.\n4. موافقة المرجع للموظف على الدراسة." },
+                    { id: 2, title: "القاعدة التنفيذية لجامعة نورة (القبول)", content: "يجوز للقسم المختص اشتراط اجتياز عدد من المقررات التكميلية بما لا يتجاوز ثلاث فصول دراسية. كما يشترط الحصول على درجة محددة في اختبارات القدرات العامة للجامعيين أو ما يعادلها حسب شروط البرنامج." },
+                    { id: 3, title: "المقررات التكميلية", content: "لا تحتسب مدة اجتياز المقررات التكميلية ضمن المدة النظامية للحصول على الدرجة العلمية، ولا يدخل معدلها في المعدل التراكمي لدرجة الدراسات العليا." }
+                ]
+            },
+            {
+                category: "مدد الدراسة",
+                items: [
+                    { id: 4, title: "مدة الدبلوم العالي", content: "المدة النظامية للحصول على الدبلوم العالي لا تقل عن فصليين دراسيين ولا تزيد عن أربعة فصول دراسية." },
+                    { id: 5, title: "مدة الماجستير", content: "المدة النظامية للحصول على درجة الماجستير لا تقل عن أربعة فصول دراسية ولا تزيد عن ستة فصول دراسية." },
+                    { id: 6, title: "مدة الدكتوراه", content: "المدة النظامية للحصول على درجة الدكتوراه لا تقل عن ستة فصول دراسية ولا تزيد عن عشرة فصول دراسية." }
+                ]
+            },
+            {
+                category: "التأجيل والانسحاب",
+                items: [
+                    { id: 7, title: "تأجيل الدراسة", content: "يجوز للطالب تأجيل دراسته بموافقة مجلس القسم بما لا يتجاوز فصلين دراسيين متتاليين أو ثلاثة فصول غير متتالية بحد أقصى طوال مدة الدراسة." },
+                    { id: 8, title: "الاعتذار عن الدراسة", content: "إذا اعتذر الطالب عن فصل دراسي واحد فلا يدخل ضمن المدة النظامية للدراسة، بشرط أن يقدم الطلب قبل بدء الاختبارات النهائية بمدة كافية." }
+                ]
+            },
+            {
+                category: "الرسائل العلمية",
+                items: [
+                    { id: 9, title: "تسجيل موضوع الرسالة", content: "يتم تسجيل موضوع الرسالة بعد إنهاء كافة المقررات المطلوبة وبمعدل تراكمي لا يقل عن (3.75 من 5). يقدم الطالب خطة البحث لمجلس القسم لإقرارها." },
+                    { id: 10, title: "الإشراف العلمي", content: "يشرف على الرسائل العلمية الأساتذة والأساتذة المشاركون، ويجوز للأستاذ المساعد الإشراف في حالات محددة وبقرار من مجلس عمادة الدراسات العليا." }
+                ]
+            }
         ];
 
         const Icons = {
             Send: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 3 3 9-3 9 19-9Z"/><path d="M6 12h16"/></svg>,
-            User: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
-            Clock: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-            Shield: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
-            Search: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            Book: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M8 7h6"/><path d="M8 11h8"/></svg>,
+            Search: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
+            Info: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
         };
 
         const App = () => {
             const [messages, setMessages] = useState([
                 { 
                     role: 'assistant', 
-                    content: 'مرحباً بكِ في محرك البحث الذكي لجامعة الأميرة نورة. يمكنني البحث لكِ في نصوص اللائحة والقواعد التنفيذية فوراً. ما الذي تودين البحث عنه؟ (مثال: شروط القبول، مدة الدراسة)' 
+                    content: 'مرحباً بكِ في المساعد الرقمي للائحة الدراسات العليا بجامعة الأميرة نورة. يمكنكِ اختيار العناوين من القائمة الجانبية لاستعراض المواد فوراً، أو البحث عن كلمة معينة.' 
                 }
             ]);
             const [input, setInput] = useState('');
-            const [loading, setLoading] = useState(false);
             const messagesEndRef = useRef(null);
             
             const pnuLogo = "https://pnu.edu.sa/Style%20Library/NewStyle/UI5/images/pnu-logo-ar.svg";
@@ -91,71 +113,78 @@
                 messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
             }, [messages]);
 
-            // دالة البحث النصي
-            const performSearch = (query) => {
-                const searchTerms = query.toLowerCase().split(' ').filter(t => t.length > 2);
-                if (searchTerms.length === 0) return null;
-
-                return PNU_REGULATIONS.filter(item => {
-                    const fullText = (item.title + " " + item.content).toLowerCase();
-                    return searchTerms.some(term => fullText.includes(term));
-                });
+            const showContent = (title, content) => {
+                const userMsg = { role: 'user', content: title };
+                const aiMsg = { role: 'assistant', content: content };
+                setMessages(prev => [...prev, userMsg, aiMsg]);
             };
 
-            const handleSend = () => {
+            const handleSearch = () => {
                 if (!input.trim()) return;
+                
+                const results = [];
+                PNU_DATA.forEach(cat => {
+                    cat.items.forEach(item => {
+                        if (item.title.includes(input) || item.content.includes(input)) {
+                            results.push(item);
+                        }
+                    });
+                });
 
-                const userMsg = { role: 'user', content: input };
-                setMessages(prev => [...prev, userMsg]);
-                setLoading(true);
+                const userMsg = { role: 'user', content: `البحث عن: ${input}` };
+                let aiMsg;
+                if (results.length > 0) {
+                    aiMsg = { 
+                        role: 'assistant', 
+                        content: `نتائج البحث عن "${input}":\n\n` + results.map(r => `📌 **${r.title}**\n${r.content}`).join('\n\n---\n\n') 
+                    };
+                } else {
+                    aiMsg = { role: 'assistant', content: `نعتذر، لم نجد نتائج مطابقة للكلمة "${input}" في اللائحة الحالية.` };
+                }
 
-                // محاكاة تأخير بسيط للبحث
-                setTimeout(() => {
-                    const results = performSearch(input);
-                    let responseContent = "";
-
-                    if (results && results.length > 0) {
-                        responseContent = `وجدت لكِ ${results.length} نتائج في اللائحة:\n\n` + 
-                            results.map(r => `📌 **${r.title}**\n${r.content}`).join('\n\n---\n\n');
-                    } else {
-                        responseContent = "عذراً، لم أجد نصوصاً مطابقة تماماً في اللائحة الحالية. حاولي استخدام كلمات مفتاحية أخرى مثل 'قبول'، 'رسالة'، أو 'تأجيل'.";
-                    }
-
-                    setMessages(prev => [...prev, { role: 'assistant', content: responseContent }]);
-                    setLoading(false);
-                    setInput('');
-                }, 500);
+                setMessages(prev => [...prev, userMsg, aiMsg]);
+                setInput('');
             };
 
             return (
                 <div className="flex h-screen w-full bg-[#f4f9f4] text-slate-800" dir="rtl">
                     
-                    {/* القائمة الجانبية */}
-                    <aside className="hidden md:flex flex-col w-80 border-l border-[#daeada] bg-white shadow-lg p-6">
-                        <div className="flex flex-col items-center gap-4 mb-10 text-center">
-                            <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-md bg-white p-2 border border-emerald-100">
+                    {/* القائمة الجانبية - بنود اللائحة */}
+                    <aside className="hidden md:flex flex-col w-85 border-l border-[#daeada] bg-white shadow-xl overflow-hidden">
+                        {/* تعديل هنا: خلفية بيضاء مع نصوص خضراء */}
+                        <div className="p-6 border-b border-emerald-100 text-center bg-white">
+                            <div className="w-20 h-20 mx-auto rounded-xl bg-white p-1 mb-3 border border-emerald-50 shadow-sm">
                                 <img src={pnuLogo} alt="PNU Logo" className="w-full h-full object-contain" />
                             </div>
-                            <h1 className="font-bold text-lg text-[#006747]">جامعة الأميرة نورة</h1>
-                            <p className="text-[10px] text-gray-400 font-bold tracking-widest uppercase">دليل الدراسات العليا</p>
+                            <h1 className="font-black text-[#006747] text-sm">لائحة الدراسات العليا</h1>
+                            <p className="text-[10px] text-emerald-600/60 font-bold uppercase tracking-widest mt-1">جامعة الأميرة نورة</p>
                         </div>
 
-                        <nav className="flex-1 space-y-4">
-                            <div className="text-[11px] font-black text-gray-400 uppercase tracking-widest px-2 mb-2">كلمات شائعة</div>
-                            {["شروط القبول", "مدة الدراسة", "تأجيل الدراسة", "الرسالة العلمية"].map((cmd) => (
-                                <button 
-                                    key={cmd}
-                                    onClick={() => { setInput(cmd); }}
-                                    className="w-full flex items-center gap-3 p-4 rounded-2xl border border-emerald-50 bg-white hover:bg-emerald-50 transition-all shadow-sm text-sm font-bold text-[#006747]"
-                                >
-                                    <Icons.Search />
-                                    <span>{cmd}</span>
-                                </button>
+                        <nav className="flex-1 overflow-y-auto p-4 no-scrollbar">
+                            {PNU_DATA.map((cat, idx) => (
+                                <div key={idx}>
+                                    <div className="category-header">{cat.category}</div>
+                                    <div className="space-y-1">
+                                        {cat.items.map(item => (
+                                            <button 
+                                                key={item.id}
+                                                onClick={() => showContent(item.title, item.content)}
+                                                className="w-full text-right px-3 py-3 rounded-lg hover:bg-emerald-50 transition-colors flex items-center gap-2 group border border-transparent hover:border-emerald-100"
+                                            >
+                                                <div className="text-[#006747] opacity-40 group-hover:opacity-100"><Icons.Book /></div>
+                                                <span className="text-xs font-bold text-slate-600 group-hover:text-[#006747]">{item.title}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
                             ))}
                         </nav>
 
-                        <div className="mt-auto p-4 bg-emerald-900 rounded-2xl text-[10px] text-emerald-100 opacity-80 text-center leading-relaxed">
-                            هذا النظام يعمل محلياً بالكامل ولا يحتاج لاتصال خارجي بالذكاء الاصطناعي.
+                        <div className="p-4 border-t bg-gray-50">
+                            <div className="flex items-center gap-2 text-[#006747]">
+                                <Icons.Info />
+                                <span className="text-[10px] font-bold">دليل استرشادي فوري - بدون إنترنت</span>
+                            </div>
                         </div>
                     </aside>
 
@@ -163,45 +192,45 @@
                     <main className="flex-1 flex flex-col h-full overflow-hidden relative">
                         <header className="px-6 py-4 border-b bg-white flex items-center justify-between shadow-sm z-10">
                             <div className="flex items-center gap-3">
-                                <div className="md:hidden w-10 h-10 bg-white p-1 rounded-lg border border-emerald-100"><img src={pnuLogo} className="w-full h-full object-contain" /></div>
+                                <div className="md:hidden w-10 h-10 bg-white p-1 rounded-lg border border-emerald-100 shadow-sm"><img src={pnuLogo} className="w-full h-full object-contain" /></div>
                                 <div>
-                                    <h2 className="font-black text-[#006747]">مساعد اللائحة (نسخة GitHub)</h2>
-                                    <p className="text-[9px] text-emerald-600/50 font-bold">نظام بحث نصي فوري داخل الملف</p>
+                                    <h2 className="font-black text-[#006747]">مساعد اللائحة الرقمي</h2>
+                                    <p className="text-[9px] text-emerald-600/50 font-bold">استعراض المواد والبنود القانونية</p>
                                 </div>
                             </div>
                         </header>
 
+                        {/* الرسائل */}
                         <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-6 no-scrollbar">
                             {messages.map((msg, index) => (
                                 <div key={index} className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-end'} animate-msg`}>
                                     <div className={`max-w-[85%] md:max-w-[75%] rounded-[2rem] p-6 shadow-sm ${msg.role === 'user' ? 'bg-white border border-emerald-50' : 'chat-bubble-ai text-slate-800'}`}>
-                                        <div className="text-[10px] font-black mb-1 opacity-40 uppercase tracking-widest border-b border-emerald-50 pb-1 flex items-center gap-2">
-                                            {msg.role === 'assistant' ? <Icons.Shield /> : <Icons.User />}
-                                            {msg.role === 'assistant' ? 'مساعد نورة' : 'الباحثة'}
+                                        <div className="text-[10px] font-black mb-1 opacity-30 uppercase tracking-widest border-b border-emerald-50 pb-1 mb-2">
+                                            {msg.role === 'assistant' ? 'نص اللائحة التنفيذية' : 'استفسار الباحثة'}
                                         </div>
-                                        <div className="text-sm md:text-base leading-relaxed font-medium mt-2 whitespace-pre-wrap">{msg.content}</div>
+                                        <div className="text-sm md:text-base leading-[1.8] font-medium whitespace-pre-wrap">{msg.content}</div>
                                     </div>
                                 </div>
                             ))}
-                            {loading && <div className="flex justify-end text-[#006747] font-bold text-xs animate-pulse">جاري البحث في مواد اللائحة...</div>}
                             <div ref={messagesEndRef} />
                         </div>
 
-                        <div className="p-4 md:p-6 bg-white border-t border-emerald-50">
+                        {/* البحث */}
+                        <div className="p-4 md:p-6 bg-white border-t border-emerald-50 shadow-2xl">
                             <div className="max-w-4xl mx-auto relative flex items-center">
                                 <input 
                                     type="text" 
                                     value={input} 
                                     onChange={(e) => setInput(e.target.value)} 
-                                    onKeyPress={(e) => e.key === 'Enter' && handleSend()} 
-                                    placeholder="اكتبي كلمة للبحث (مثلاً: قبول، مدة، دكتوراه)..." 
-                                    className="w-full py-5 pr-5 pl-14 rounded-full border-2 border-emerald-50 bg-[#fcfdfc] focus:border-[#006747] outline-none font-bold shadow-inner"
+                                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()} 
+                                    placeholder="اكتبي كلمة للبحث داخل اللائحة (مثلاً: قبول، مدة، رسالة)..." 
+                                    className="w-full py-5 pr-5 pl-14 rounded-full border-2 border-emerald-50 bg-[#fcfdfc] focus:border-[#006747] outline-none font-bold shadow-inner text-sm"
                                 />
                                 <button 
-                                    onClick={handleSend} 
-                                    className="absolute left-3 p-3 rounded-full bg-[#006747] text-white transition-transform active:scale-95 shadow-md"
+                                    onClick={handleSearch} 
+                                    className="absolute left-3 p-3 rounded-full bg-[#006747] text-white transition-transform active:scale-95 shadow-lg"
                                 >
-                                    <Icons.Send />
+                                    <Icons.Search />
                                 </button>
                             </div>
                         </div>
