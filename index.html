@@ -56,36 +56,59 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // قاعدة البيانات النصية المستخرجة من اللائحة والقواعد التنفيذية
+        // قاعدة بيانات شاملة لكافة بنود اللائحة المنظمة للدراسات العليا بجامعة نورة
         const PNU_DATA = [
             { 
                 category: "القبول والتسجيل",
                 items: [
                     { id: 1, title: "شروط القبول العامة", content: "يشترط للقبول في الدراسات العليا: \n1. أن يكون المتقدم حاصلاً على الشهادة الجامعية من جامعة سعودية أو معترف بها.\n2. حسن السيرة والسلوك والياقة الطبية.\n3. تقديم تزكيتين علميتين من أساتذة سبق لهم تدريسه.\n4. موافقة المرجع للموظف على الدراسة." },
-                    { id: 2, title: "القاعدة التنفيذية لجامعة نورة (القبول)", content: "يجوز للقسم المختص اشتراط اجتياز عدد من المقررات التكميلية بما لا يتجاوز ثلاث فصول دراسية. كما يشترط الحصول على درجة محددة في اختبارات القدرات العامة للجامعيين أو ما يعادلها حسب شروط البرنامج." },
-                    { id: 3, title: "المقررات التكميلية", content: "لا تحتسب مدة اجتياز المقررات التكميلية ضمن المدة النظامية للحصول على الدرجة العلمية، ولا يدخل معدلها في المعدل التراكمي لدرجة الدراسات العليا." }
+                    { id: 2, title: "القواعد التنفيذية للقبول (نورة)", content: "يجوز للقسم اشتراط اجتياز مقررات تكميلية (بحد أقصى 3 فصول). يشترط الحصول على درجة محددة في اختبارات القدرات العامة للجامعيين. كما يجوز للقسم اشتراط اختبار تحريري أو مقابلة شخصية." },
+                    { id: 3, title: "المقررات التكميلية", content: "لا تحتسب مدة المقررات التكميلية ضمن المدة النظامية. يجب اجتيازها في المرة الأولى بمعدل لا يقل عن جيد جداً. لا يدخل معدلها في معدل الدراسات العليا." }
                 ]
             },
             {
-                category: "مدد الدراسة",
+                category: "مدد الدراسة ونظامها",
                 items: [
-                    { id: 4, title: "مدة الدبلوم العالي", content: "المدة النظامية للحصول على الدبلوم العالي لا تقل عن فصليين دراسيين ولا تزيد عن أربعة فصول دراسية." },
-                    { id: 5, title: "مدة الماجستير", content: "المدة النظامية للحصول على درجة الماجستير لا تقل عن أربعة فصول دراسية ولا تزيد عن ستة فصول دراسية." },
-                    { id: 6, title: "مدة الدكتوراه", content: "المدة النظامية للحصول على درجة الدكتوراه لا تقل عن ستة فصول دراسية ولا تزيد عن عشرة فصول دراسية." }
+                    { id: 4, title: "مدة الدبلوم العالي", content: "لا تقل عن فصلين دراسيين ولا تزيد عن أربعة فصول دراسية." },
+                    { id: 5, title: "مدة الماجستير", content: "لا تقل عن أربعة فصول دراسية ولا تزيد عن ستة فصول دراسية." },
+                    { id: 6, title: "مدة الدكتوراه", content: "لا تقل عن ستة فصول دراسية ولا تزيد عن عشرة فصول دراسية." },
+                    { id: 11, title: "الحذف والإضافة", content: "يجوز حذف مقرر أو أكثر خلال المدة الزمنية المحددة في التقويم الدراسي، بشرط ألا يقل العبء الدراسي عن الحد الأدنى." }
                 ]
             },
             {
-                category: "التأجيل والانسحاب",
+                category: "التأجيل والاعتذار والانسحاب",
                 items: [
-                    { id: 7, title: "تأجيل الدراسة", content: "يجوز للطالب تأجيل دراسته بموافقة مجلس القسم بما لا يتجاوز فصلين دراسيين متتاليين أو ثلاثة فصول غير متتالية بحد أقصى طوال مدة الدراسة." },
-                    { id: 8, title: "الاعتذار عن الدراسة", content: "إذا اعتذر الطالب عن فصل دراسي واحد فلا يدخل ضمن المدة النظامية للدراسة، بشرط أن يقدم الطلب قبل بدء الاختبارات النهائية بمدة كافية." }
+                    { id: 7, title: "تأجيل الدراسة", content: "يجوز تأجيل الدراسة بما لا يتجاوز فصلين متتاليين أو ثلاثة غير متتالية. لا تحتسب مدة التأجيل ضمن المدة النظامية." },
+                    { id: 8, title: "الاعتذار عن فصل دراسي", content: "يجوز الاعتذار عن الدراسة قبل الاختبارات النهائية. لا يدخل الفصل المعتذر عنه ضمن المدة النظامية." },
+                    { id: 12, title: "الانسحاب من الجامعة", content: "يعتبر الطالب منسحباً إذا تقدم بطلب رسمي، أو إذا انقطع عن الدراسة دون طلب تأجيل، أو إذا لم يسجل في فصل دراسي." }
+                ]
+            },
+            {
+                category: "التحويل",
+                items: [
+                    { id: 13, title: "التحويل من جامعة أخرى", content: "يشترط أن تكون الجامعة معترفاً بها، وألا يكون الطالب مفصولاً، وأن تنطبق عليه شروط القبول بالقسم، وأن يدرس في جامعة نورة 50% على الأقل من البرنامج." },
+                    { id: 14, title: "التحويل من تخصص لآخر", content: "يجوز التحويل داخل الجامعة بموافقة القسمين ومجلس الكلية، مع معادلة المقررات المشتركة." }
+                ]
+            },
+            {
+                category: "الاختبارات والتقديرات",
+                items: [
+                    { id: 15, title: "المعدل التراكمي", content: "لا يجوز أن يقل المعدل التراكمي للطالب في الدراسات العليا عن (جيد جداً). في حال قل عنه، يوجه للطالب إنذار." },
+                    { id: 16, title: "الاختبار الشامل (الدكتوراه)", content: "يهدف الاختبار لقياس تمكن الطالب من التخصص. يعقد بعد إنهاء المقررات. إذا رسب الطالب يمنح فرصة واحدة، وإذا رسب ثانية يطوى قيده." }
                 ]
             },
             {
                 category: "الرسائل العلمية",
                 items: [
-                    { id: 9, title: "تسجيل موضوع الرسالة", content: "يتم تسجيل موضوع الرسالة بعد إنهاء كافة المقررات المطلوبة وبمعدل تراكمي لا يقل عن (3.75 من 5). يقدم الطالب خطة البحث لمجلس القسم لإقرارها." },
-                    { id: 10, title: "الإشراف العلمي", content: "يشرف على الرسائل العلمية الأساتذة والأساتذة المشاركون، ويجوز للأستاذ المساعد الإشراف في حالات محددة وبقرار من مجلس عمادة الدراسات العليا." }
+                    { id: 9, title: "تسجيل الرسالة", content: "يشترط إنهاء المقررات ومعدل (3.75 من 5). يقدم الطالب خطة بحث. يتم التسجيل بقرار من مجلس عمادة الدراسات العليا." },
+                    { id: 10, title: "الإشراف العلمي", content: "يشرف على الرسائل الأساتذة والأساتذة المشاركون. الأستاذ المساعد يشرف في حالات خاصة. الحد الأقصى للإشراف 4 رسائل (أو 6 بقرار استثنائي)." },
+                    { id: 17, title: "مناقشة الرسالة", content: "تتم المناقشة علنياً أمام لجنة مكونة من 3 أعضاء للماجستير و3-5 للدكتوراه، أحدهم من خارج الجامعة." }
+                ]
+            },
+            {
+                category: "طي القيد",
+                items: [
+                    { id: 18, title: "حالات طي القيد", content: "1. القبول في جامعة أخرى.\n2. الرسوب في الاختبار الشامل.\n3. الانقطاع عن الدراسة.\n4. تدني المعدل التراكمي عن جيد جداً لفصلين.\n5. تجاوز المدة النظامية." }
                 ]
             }
         ];
@@ -101,7 +124,7 @@
             const [messages, setMessages] = useState([
                 { 
                     role: 'assistant', 
-                    content: 'مرحباً بكِ في المساعد الرقمي للائحة الدراسات العليا بجامعة الأميرة نورة. يمكنكِ اختيار العناوين من القائمة الجانبية لاستعراض المواد فوراً، أو البحث عن كلمة معينة.' 
+                    content: 'مرحباً بكِ في الدليل الرقمي الشامل للائحة الدراسات العليا بجامعة الأميرة نورة. تم تفريع اللائحة إلى أقسام (القبول، مدد الدراسة، التحويل، الرسائل، إلخ). يمكنكِ الضغط على أي بند من القائمة الجانبية أو البحث عن أي كلمة مفتاحية.' 
                 }
             ]);
             const [input, setInput] = useState('');
@@ -120,26 +143,28 @@
             };
 
             const handleSearch = () => {
-                if (!input.trim()) return;
+                const query = input.trim();
+                if (!query) return;
                 
                 const results = [];
                 PNU_DATA.forEach(cat => {
                     cat.items.forEach(item => {
-                        if (item.title.includes(input) || item.content.includes(input)) {
+                        if (item.title.toLowerCase().includes(query.toLowerCase()) || 
+                            item.content.toLowerCase().includes(query.toLowerCase())) {
                             results.push(item);
                         }
                     });
                 });
 
-                const userMsg = { role: 'user', content: `البحث عن: ${input}` };
+                const userMsg = { role: 'user', content: `البحث عن: ${query}` };
                 let aiMsg;
                 if (results.length > 0) {
                     aiMsg = { 
                         role: 'assistant', 
-                        content: `نتائج البحث عن "${input}":\n\n` + results.map(r => `📌 **${r.title}**\n${r.content}`).join('\n\n---\n\n') 
+                        content: `نتائج البحث عن "${query}":\n\n` + results.map(r => `📌 **${r.title}**\n${r.content}`).join('\n\n---\n\n') 
                     };
                 } else {
-                    aiMsg = { role: 'assistant', content: `نعتذر، لم نجد نتائج مطابقة للكلمة "${input}" في اللائحة الحالية.` };
+                    aiMsg = { role: 'assistant', content: `عذراً، لم أجد نصوصاً مطابقة للكلمة "${query}" في بنود اللائحة.` };
                 }
 
                 setMessages(prev => [...prev, userMsg, aiMsg]);
@@ -149,14 +174,13 @@
             return (
                 <div className="flex h-screen w-full bg-[#f4f9f4] text-slate-800" dir="rtl">
                     
-                    {/* القائمة الجانبية - بنود اللائحة */}
-                    <aside className="hidden md:flex flex-col w-85 border-l border-[#daeada] bg-white shadow-xl overflow-hidden">
-                        {/* تعديل هنا: خلفية بيضاء مع نصوص خضراء */}
+                    {/* القائمة الجانبية - بنود اللائحة المستخرجة من PDF */}
+                    <aside className="hidden md:flex flex-col w-96 border-l border-[#daeada] bg-white shadow-xl overflow-hidden">
                         <div className="p-6 border-b border-emerald-100 text-center bg-white">
                             <div className="w-20 h-20 mx-auto rounded-xl bg-white p-1 mb-3 border border-emerald-50 shadow-sm">
                                 <img src={pnuLogo} alt="PNU Logo" className="w-full h-full object-contain" />
                             </div>
-                            <h1 className="font-black text-[#006747] text-sm">لائحة الدراسات العليا</h1>
+                            <h1 className="font-black text-[#006747] text-sm">لائحة الدراسات العليا وقواعدها</h1>
                             <p className="text-[10px] text-emerald-600/60 font-bold uppercase tracking-widest mt-1">جامعة الأميرة نورة</p>
                         </div>
 
@@ -180,10 +204,10 @@
                             ))}
                         </nav>
 
-                        <div className="p-4 border-t bg-gray-50">
-                            <div className="flex items-center gap-2 text-[#006747]">
+                        <div className="p-4 border-t bg-gray-50 text-center">
+                            <div className="flex items-center justify-center gap-2 text-[#006747]">
                                 <Icons.Info />
-                                <span className="text-[10px] font-bold">دليل استرشادي فوري - بدون إنترنت</span>
+                                <span className="text-[10px] font-bold tracking-tight">نظام مرجعي فوري - بيانات اللائحة المعتمدة</span>
                             </div>
                         </div>
                     </aside>
@@ -194,8 +218,8 @@
                             <div className="flex items-center gap-3">
                                 <div className="md:hidden w-10 h-10 bg-white p-1 rounded-lg border border-emerald-100 shadow-sm"><img src={pnuLogo} className="w-full h-full object-contain" /></div>
                                 <div>
-                                    <h2 className="font-black text-[#006747]">مساعد اللائحة الرقمي</h2>
-                                    <p className="text-[9px] text-emerald-600/50 font-bold">استعراض المواد والبنود القانونية</p>
+                                    <h2 className="font-black text-[#006747]">المساعد الرقمي لعمادة الدراسات العليا</h2>
+                                    <p className="text-[9px] text-emerald-600/50 font-bold uppercase">PNU Postgraduate Guidelines</p>
                                 </div>
                             </div>
                         </header>
@@ -204,7 +228,7 @@
                         <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-6 no-scrollbar">
                             {messages.map((msg, index) => (
                                 <div key={index} className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-end'} animate-msg`}>
-                                    <div className={`max-w-[85%] md:max-w-[75%] rounded-[2rem] p-6 shadow-sm ${msg.role === 'user' ? 'bg-white border border-emerald-50' : 'chat-bubble-ai text-slate-800'}`}>
+                                    <div className={`max-w-[85%] md:max-w-[80%] rounded-[2rem] p-6 shadow-sm ${msg.role === 'user' ? 'bg-white border border-emerald-50' : 'chat-bubble-ai text-slate-800'}`}>
                                         <div className="text-[10px] font-black mb-1 opacity-30 uppercase tracking-widest border-b border-emerald-50 pb-1 mb-2">
                                             {msg.role === 'assistant' ? 'نص اللائحة التنفيذية' : 'استفسار الباحثة'}
                                         </div>
@@ -215,7 +239,7 @@
                             <div ref={messagesEndRef} />
                         </div>
 
-                        {/* البحث */}
+                        {/* البحث الفوري */}
                         <div className="p-4 md:p-6 bg-white border-t border-emerald-50 shadow-2xl">
                             <div className="max-w-4xl mx-auto relative flex items-center">
                                 <input 
@@ -223,7 +247,7 @@
                                     value={input} 
                                     onChange={(e) => setInput(e.target.value)} 
                                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()} 
-                                    placeholder="اكتبي كلمة للبحث داخل اللائحة (مثلاً: قبول، مدة، رسالة)..." 
+                                    placeholder="اكتبي كلمة للبحث السريع (مثلاً: التحويل، طي القيد، الإشراف)..." 
                                     className="w-full py-5 pr-5 pl-14 rounded-full border-2 border-emerald-50 bg-[#fcfdfc] focus:border-[#006747] outline-none font-bold shadow-inner text-sm"
                                 />
                                 <button 
