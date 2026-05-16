@@ -58,11 +58,6 @@
             opacity: 0.9;
             transform: scale(0.98);
         }
-
-        .submenu-item {
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
     </style>
 </head>
 <body class="bg-[#f4f9f4]">
@@ -71,59 +66,56 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // قاعدة بيانات شاملة لكافة بنود اللائحة المنظمة للدراسات العليا بجامعة نورة
+        // قاعدة البيانات الشاملة المحدثة مع تعديل مدة التأجيل لأربعة فصول
         const PNU_DATA = [
             { 
+                category: "تعريفات وأحكام عامة",
+                items: [
+                    { id: 1, title: "المادة الأولى: التعريفات", content: "الدراسات العليا: مرحلة دراسية أعلى من مرحلة البكالوريوس كالدبلوم العالي، أو الماجستير، أو الدكتوراه.\n\nالتصنيف: التصنيف السعودي الموحد للمستويات والتخصصات التعليمية." },
+                    { id: 2, title: "المادة الثانية: أهداف الدراسات العليا", content: "تتلخص أهداف الدراسات العليا في العناية بالدراسات الإسلامية والعربية، المساهمة في إثراء المعرفة الإنسانية، تمكين الكفاءات العلمية، وتشجيع البحث العلمي." }
+                ]
+            },
+            {
                 category: "القبول والتسجيل",
                 items: [
-                    { id: 1, title: "شروط القبول العامة", content: "يشترط للقبول في الدراسات العليا: \n1. أن يكون المتقدم حاصلاً على الشهادة الجامعية من جامعة سعودية أو معترف بها.\n2. حسن السيرة والسلوك والياقة الطبية.\n3. تقديم تزكيتين علميتين من أساتذة سبق لهم تدريسه.\n4. موافقة المرجع للموظف على الدراسة." },
-                    { id: 2, title: "القواعد التنفيذية للقبول (نورة)", content: "يجوز للقسم اشتراط اجتياز مقررات تكميلية (بحد أقصى 3 فصول). يشترط الحصول على درجة محددة في اختبارات القدرات العامة للجامعيين. كما يجوز للقسم اشتراط اختبار تحريري أو مقابلة شخصية." },
-                    { id: 3, title: "المقررات التكميلية", content: "لا تحتسب مدة المقررات التكميلية ضمن المدة النظامية. يجب اجتيازها في المرة الأولى بمعدل لا يقل عن جيد جداً. لا يدخل معدلها في معدل الدراسات العليا." }
+                    { id: 15, title: "المادة 15: قبول الطالب", content: "نص المادة: تتولى الإدارة التنفيذية تنفيذ الإجراءات الأكاديمية، بما في ذلك قبول الطلاب وتسجيلهم.\n\nالقاعدة التنفيذية لجامعة نورة: يلزم تحقيق كافة شروط القبول المعلنة للجامعة والكليات والأقسام أثناء فترة التقديم عبر بوابة القبول الإلكترونية." },
+                    { id: 13, title: "المادة 13: شروط القبول", content: "يشترط للقبول في الدراسات العليا: \n1. أن يكون المتقدم حاصلاً على الشهادة الجامعية من جامعة سعودية أو معترف بها.\n2. حسن السيرة والسلوك والياقة الطبية.\n3. تقديم تزكيتين علميتين." },
+                    { id: 16, title: "المقررات التكميلية", content: "يجوز للقسم اشتراط اجتياز عدد من المقررات التكميلية من مرحلة سابقة، ولا تحتسب مدتها ضمن المدة النظامية للحصول على الدرجة." }
                 ]
             },
             {
-                category: "مدد الدراسة ونظامها",
+                category: "نظام الدراسة والمدد",
                 items: [
-                    { id: 4, title: "مدة الدبلوم العالي", content: "لا تقل عن فصلين دراسيين ولا تزيد عن أربعة فصول دراسية." },
-                    { id: 5, title: "مدة الماجستير", content: "لا تقل عن أربعة فصول دراسية ولا تزيد عن ستة فصول دراسية." },
-                    { id: 6, title: "مدة الدكتوراه", content: "لا تقل عن ستة فصول دراسية ولا تزيد عن عشرة فصول دراسية." },
-                    { id: 11, title: "الحذف والإضافة", content: "يجوز حذف مقرر أو أكثر خلال المدة الزمنية المحددة في التقويم الدراسي، بشرط ألا يقل العبء الدراسي عن الحد الأدنى." }
+                    { id: 12, title: "المادة 12: المدة النظامية", content: "تكون الدراسة للماجستير إما بالمقررات فقط، أو المقررات والرسالة، أو المقررات والاختبار الشامل.\n\nالقواعد التنفيذية: لا تزيد مدة دراسة الماجستير عن ستة فصول دراسية، والدكتوراه عن عشرة فصول دراسية." },
+                    { id: 11, title: "العبء الدراسي", content: "يحدد العبء الدراسي للطالب وفقاً لما تقتضيه خطة البرنامج المعتمدة، وبما يتناسب مع المعدل التراكمي." }
                 ]
             },
             {
-                category: "التأجيل والاعتذار والانسحاب",
+                category: "التأجيل والاعتذار",
                 items: [
-                    { id: 7, title: "تأجيل الدراسة", content: "يجوز تأجيل الدراسة بما لا يتجاوز فصلين متتاليين أو ثلاثة غير متتالية. لا تحتسب مدة التأجيل ضمن المدة النظامية." },
-                    { id: 8, title: "الاعتذار عن فصل دراسي", content: "يجوز الاعتذار عن الدراسة قبل الاختبارات النهائية. لا يدخل الفصل المعتذر عنه ضمن المدة النظامية." },
-                    { id: 12, title: "الانسحاب من الجامعة", content: "يعتبر الطالب منسحباً إذا تقدم بطلب رسمي، أو إذا انقطع عن الدراسة دون طلب تأجيل، أو إذا لم يسجل في فصل دراسي." }
+                    { id: 24, title: "المادة 24: تأجيل الدراسة", content: "يجوز للطالب تأجيل دراسته بموافقة مجلس القسم بما لا يتجاوز فصلين دراسيين متتاليين أو أربعة فصول غير متتالية." },
+                    { id: 25, title: "المادة 25: الاعتذار عن فصل دراسي", content: "يجوز الاعتذار عن فصل دراسي واحد إذا تقدم الطالب بطلب رسمي قبل الاختبارات النهائية، ولا يحتسب ضمن المدة النظامية." }
                 ]
             },
             {
-                category: "التحويل",
+                category: "التحويل والمعادلة",
                 items: [
-                    { id: 13, title: "التحويل من جامعة أخرى", content: "يشترط أن تكون الجامعة معترفاً بها، وألا يكون الطالب مفصولاً، وأن تنطبق عليه شروط القبول بالقسم، وأن يدرس في جامعة نورة 50% على الأقل من البرنامج." },
-                    { id: 14, title: "التحويل من تخصص لآخر", content: "يجوز التحويل داخل الجامعة بموافقة القسمين ومجلس الكلية، مع معادلة المقررات المشتركة." }
+                    { id: 43, title: "المادة 43: التحويل من جامعة أخرى", content: "يجوز قبول تحويل الطالب من جامعة معترف بها بشرط ألا يكون الطالب مفصولاً، وأن يدرس في جامعة نورة 50% على الأقل من البرنامج." },
+                    { id: 45, title: "المادة 45: معادلة المقررات", content: "تتم معادلة المقررات التي درسها الطالب خارج الجامعة بشرط ألا يكون قد مضى على اجتيازها أكثر من ستة فصول دراسية، وألا يقل تقديرها عن جيد جداً." }
                 ]
             },
             {
-                category: "الاختبارات والتقديرات",
+                category: "الرسائل العلمية والإشراف",
                 items: [
-                    { id: 15, title: "المعدل التراكمي", content: "لا يجوز أن يقل المعدل التراكمي للطالب في الدراسات العليا عن (جيد جداً). في حال قل عنه، يوجه للطالب إنذار." },
-                    { id: 16, title: "الاختبار الشامل (الدكتوراه)", content: "يهدف الاختبار لقياس تمكن الطالب من التخصص. يعقد بعد إنهاء المقررات. إذا رسب الطالب يمنح فرصة واحدة، وإذا رسب ثانية يطوى قيده." }
+                    { id: 50, title: "المادة 50: الإشراف العلمي", content: "يشرف على الرسائل العلمية الأساتذة والأساتذة المشاركون من أعضاء هيئة التدريس بالجامعة. والحد الأقصى للإشراف هو أربعة رسائل علمية." },
+                    { id: 55, title: "المادة 55: مناقشة الرسالة", content: "تشكل لجنة المناقشة بقرار من مجلس الكلية، وتتكون من ثلاثة أعضاء للماجستير وخمسة للدكتوراه." }
                 ]
             },
             {
-                category: "الرسائل العلمية",
+                category: "أحكام ختامية",
                 items: [
-                    { id: 9, title: "تسجيل الرسالة", content: "يشترط إنهاء المقررات ومعدل (3.75 من 5). يقدم الطالب خطة بحث. يتم التسجيل بقرار من مجلس عمادة الدراسات العليا." },
-                    { id: 10, title: "الإشراف العلمي", content: "يشرف على الرسائل الأساتذة والأساتذة المشاركون. الأستاذ المساعد يشرف في حالات خاصة. الحد الأقصى للإشراف 4 رسائل (أو 6 بقرار استثنائي)." },
-                    { id: 17, title: "مناقشة الرسالة", content: "تتم المناقشة علنياً أمام لجنة مكونة من 3 أعضاء للماجستير و3-5 للدكتوراه، أحدهم من خارج الجامعة." }
-                ]
-            },
-            {
-                category: "طي القيد",
-                items: [
-                    { id: 18, title: "حالات طي القيد", content: "1. القبول في جامعة أخرى.\n2. الرسوب في الاختبار الشامل.\n3. الانقطاع عن الدراسة.\n4. تدني المعدل التراكمي عن جيد جداً لفصلين.\n5. تجاوز المدة النظامية." }
+                    { id: 59, title: "المادة 59: الدبلومات الصحية", content: "يستثنى من أحكام هذه اللائحة الدبلومات الصحية والزمالات الصحية فيطبق عليهما اللوائح والقواعد الصادرة من مجلس الجامعة." },
+                    { id: 60, title: "المادة 60: القواعد التنفيذية", content: "نص المادة: يقر مجلس كل جامعة القواعد التنفيذية لهذه اللائحة.\n\nالقاعدة التنفيذية لجامعة نورة: 1. لمجلس الجامعة تفسير القواعد التنفيذية وتعديل ما يلزم منها. 2. يعمل بها من تاريخ اعتماد مجلس الجامعة." }
                 ]
             }
         ];
@@ -137,15 +129,25 @@
             ChevronUp: () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
         };
 
+        const normalizeArabic = (text) => {
+            if (!text) return "";
+            return text
+                .replace(/[أإآ]/g, "ا")
+                .replace(/ة/g, "ه")
+                .replace(/ى/g, "ي")
+                .replace(/[\u064B-\u065F]/g, "")
+                .toLowerCase();
+        };
+
         const App = () => {
             const [messages, setMessages] = useState([
                 { 
                     role: 'assistant', 
-                    content: 'مرحباً بكِ في الدليل الرقمي الشامل للائحة الدراسات العليا بجامعة الأميرة نورة. تم تفريع اللائحة إلى أقسام (القبول، مدد الدراسة، التحويل، الرسائل، إلخ). يمكنكِ الضغط على أي قسم لفتح القائمة المنسدلة واختيار البند المطلوب.' 
+                    content: 'مرحباً بكِ في المساعد الرقمي لعمادة الدراسات العليا بجامعة الأميرة نورة بنت عبد الرحمن. يسعدني مساعدتكِ في تصفح اللائحة المنظمة والبحث عن كافة المعلومات التي تهمكِ في مسيرتكِ الأكاديمية.' 
                 }
             ]);
             const [input, setInput] = useState('');
-            const [openCategories, setOpenCategories] = useState({}); // تتبع القوائم المنسدلة المفتوحة
+            const [openCategories, setOpenCategories] = useState({});
             const messagesEndRef = useRef(null);
             
             const pnuLogo = "https://pnu.edu.sa/Style%20Library/NewStyle/UI5/images/pnu-logo-ar.svg";
@@ -155,79 +157,62 @@
             }, [messages]);
 
             const showContent = (title, content) => {
-                const userMsg = { role: 'user', content: title };
-                const aiMsg = { role: 'assistant', content: content };
-                setMessages(prev => [...prev, userMsg, aiMsg]);
+                setMessages(prev => [...prev, { role: 'user', content: title }, { role: 'assistant', content: content }]);
             };
 
             const toggleCategory = (idx) => {
-                setOpenCategories(prev => ({
-                    ...prev,
-                    [idx]: !prev[idx]
-                }));
+                setOpenCategories(prev => ({ ...prev, [idx]: !prev[idx] }));
             };
 
             const handleSearch = () => {
                 const query = input.trim();
                 if (!query) return;
                 
+                const normalizedQuery = normalizeArabic(query);
                 const results = [];
+                
                 PNU_DATA.forEach(cat => {
                     cat.items.forEach(item => {
-                        if (item.title.toLowerCase().includes(query.toLowerCase()) || 
-                            item.content.toLowerCase().includes(query.toLowerCase())) {
+                        if (normalizeArabic(item.title).includes(normalizedQuery) || 
+                            normalizeArabic(item.content).includes(normalizedQuery)) {
                             results.push(item);
                         }
                     });
                 });
 
-                const userMsg = { role: 'user', content: `البحث عن: ${query}` };
-                let aiMsg;
-                if (results.length > 0) {
-                    aiMsg = { 
-                        role: 'assistant', 
-                        content: `نتائج البحث عن "${query}":\n\n` + results.map(r => `📌 **${r.title}**\n${r.content}`).join('\n\n---\n\n') 
-                    };
-                } else {
-                    aiMsg = { role: 'assistant', content: `عذراً، لم أجد نصوصاً مطابقة للكلمة "${query}" في بنود اللائحة.` };
-                }
-
-                setMessages(prev => [...prev, userMsg, aiMsg]);
+                setMessages(prev => [...prev, 
+                    { role: 'user', content: `البحث عن: ${query}` }, 
+                    { role: 'assistant', content: results.length > 0 
+                        ? `نتائج البحث عن "${query}":\n\n` + results.map(r => `📌 **${r.title}**\n${r.content}`).join('\n\n---\n\n')
+                        : `نعتذر، لم نجد نتائج مطابقة للكلمة "${query}" في لائحة الدراسات العليا.`
+                    }
+                ]);
                 setInput('');
             };
 
             return (
                 <div className="flex h-screen w-full bg-[#f4f9f4] text-slate-800" dir="rtl">
-                    
-                    {/* القائمة الجانبية - بنود اللائحة المنسدلة */}
                     <aside className="hidden md:flex flex-col w-96 border-l border-[#daeada] bg-white shadow-xl overflow-hidden">
                         <div className="p-6 border-b border-emerald-100 text-center bg-white">
                             <div className="w-20 h-20 mx-auto rounded-xl bg-white p-1 mb-3 border border-emerald-50 shadow-sm">
                                 <img src={pnuLogo} alt="PNU Logo" className="w-full h-full object-contain" />
                             </div>
-                            <h1 className="font-black text-[#006747] text-sm">لائحة الدراسات العليا وقواعدها</h1>
-                            <p className="text-[10px] text-emerald-600/60 font-bold uppercase tracking-widest mt-1">جامعة الأميرة نورة</p>
+                            <h1 className="font-black text-[#006747] text-sm">اللائحة والقواعد التنفيذية</h1>
+                            <p className="text-[10px] text-emerald-600/60 font-bold uppercase tracking-widest mt-1">جامعة الأميرة نورة بنت عبد الرحمن</p>
                         </div>
 
                         <nav className="flex-1 overflow-y-auto p-4 no-scrollbar">
                             {PNU_DATA.map((cat, idx) => (
                                 <div key={idx} className="mb-2">
-                                    <div 
-                                        className="category-header" 
-                                        onClick={() => toggleCategory(idx)}
-                                    >
+                                    <div className="category-header" onClick={() => toggleCategory(idx)}>
                                         <span>{cat.category}</span>
                                         {openCategories[idx] ? <Icons.ChevronUp /> : <Icons.ChevronDown />}
                                     </div>
-                                    
                                     {openCategories[idx] && (
                                         <div className="space-y-1 mt-1 pr-2 border-r-2 border-emerald-100 animate-msg">
                                             {cat.items.map(item => (
-                                                <button 
-                                                    key={item.id}
-                                                    onClick={() => showContent(item.title, item.content)}
-                                                    className="w-full text-right px-3 py-2.5 rounded-lg hover:bg-emerald-50 transition-colors flex items-center gap-2 group border border-transparent hover:border-emerald-100"
-                                                >
+                                                <button key={item.id} onClick={() => showContent(item.title, item.content)}
+                                                    className="w-full text-right px-3 py-2.5 rounded-lg hover:bg-emerald-50 transition-colors flex items-center gap-2 group border border-transparent hover:border-emerald-100">
                                                     <div className="text-[#006747] opacity-40 group-hover:opacity-100 shrink-0"><Icons.Book /></div>
                                                     <span className="text-xs font-semibold text-slate-600 group-hover:text-[#006747]">{item.title}</span>
                                                 </button>
@@ -237,28 +222,25 @@
                                 </div>
                             ))}
                         </nav>
-
                         <div className="p-4 border-t bg-gray-50 text-center">
                             <div className="flex items-center justify-center gap-2 text-[#006747]">
                                 <Icons.Info />
-                                <span className="text-[10px] font-bold tracking-tight">نظام مرجعي فوري - بيانات اللائحة المعتمدة</span>
+                                <span className="text-[10px] font-bold tracking-tight">نظام مرجعي ذكي للائحة الدراسات العليا</span>
                             </div>
                         </div>
                     </aside>
 
-                    {/* المحتوى الرئيسي */}
                     <main className="flex-1 flex flex-col h-full overflow-hidden relative">
                         <header className="px-6 py-4 border-b bg-white flex items-center justify-between shadow-sm z-10">
                             <div className="flex items-center gap-3">
                                 <div className="md:hidden w-10 h-10 bg-white p-1 rounded-lg border border-emerald-100 shadow-sm"><img src={pnuLogo} className="w-full h-full object-contain" /></div>
                                 <div>
-                                    <h2 className="font-black text-[#006747]">المساعد الرقمي لعمادة الدراسات العليا</h2>
-                                    <p className="text-[9px] text-emerald-600/50 font-bold uppercase">PNU Postgraduate Guidelines</p>
+                                    <h2 className="font-black text-[#006747]">مساعد الدراسات العليا الرقمي</h2>
+                                    <p className="text-[9px] text-emerald-600/50 font-bold uppercase tracking-tighter">عمادة الدراسات العليا - جامعة نورة</p>
                                 </div>
                             </div>
                         </header>
 
-                        {/* الرسائل */}
                         <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-6 no-scrollbar">
                             {messages.map((msg, index) => (
                                 <div key={index} className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-end'} animate-msg`}>
@@ -273,23 +255,12 @@
                             <div ref={messagesEndRef} />
                         </div>
 
-                        {/* البحث الفوري */}
                         <div className="p-4 md:p-6 bg-white border-t border-emerald-50 shadow-2xl">
                             <div className="max-w-4xl mx-auto relative flex items-center">
-                                <input 
-                                    type="text" 
-                                    value={input} 
-                                    onChange={(e) => setInput(e.target.value)} 
-                                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()} 
-                                    placeholder="اكتبي كلمة للبحث السريع (مثلاً: التحويل، طي القيد، الإشراف)..." 
-                                    className="w-full py-5 pr-5 pl-14 rounded-full border-2 border-emerald-50 bg-[#fcfdfc] focus:border-[#006747] outline-none font-bold shadow-inner text-sm"
-                                />
-                                <button 
-                                    onClick={handleSearch} 
-                                    className="absolute left-3 p-3 rounded-full bg-[#006747] text-white transition-transform active:scale-95 shadow-lg"
-                                >
-                                    <Icons.Search />
-                                </button>
+                                <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSearch()} 
+                                    placeholder="اكتبي كلمة للبحث (مثل: تأجيل، قبول، دراسة)..." 
+                                    className="w-full py-5 pr-5 pl-14 rounded-full border-2 border-emerald-50 bg-[#fcfdfc] focus:border-[#006747] outline-none font-bold shadow-inner text-sm" />
+                                <button onClick={handleSearch} className="absolute left-3 p-3 rounded-full bg-[#006747] text-white transition-transform active:scale-95 shadow-lg"><Icons.Search /></button>
                             </div>
                         </div>
                     </main>
